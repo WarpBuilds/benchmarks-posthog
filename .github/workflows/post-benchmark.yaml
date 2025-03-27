@@ -10,6 +10,7 @@ jobs:
   fetch-timings:
     name: Fetch Benchmark Timings & Upload to R2
     runs-on: warp-ubuntu-latest-x64-8x
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
