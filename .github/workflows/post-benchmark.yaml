@@ -21,7 +21,6 @@ jobs:
           script: |
             // This script uses the context of the triggering workflow run
             const run_id = context.payload.workflow_run.id;
-            console.log(github);
             const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
               owner: context.payload.repository.owner.login,
               repo: context.payload.repository.name,
@@ -33,11 +32,23 @@ jobs:
               const start = new Date(job.started_at);
               const end = new Date(job.completed_at);
               const duration = Math.round((end - start) / 1000); // duration in seconds
+
+              let jobProvider = 'github';
+              if (job.name.includes('Build with WarpBuild Docker Builders')){
+                jobProvider = 'warpbuild';
+              }
               return {
+                id: job.id,
                 job: job.name,
                 duration: duration,
+                created_at: job.created_at,
                 started_at: job.started_at,
-                completed_at: job.completed_at
+                completed_at: job.completed_at,
+                run_url: job.run_url,
+                html_url: job.html_url,
+                status: job.status,
+                conclusion: job.conclusion,
+                provider: jobProvider
               };
             });
             core.setOutput("timings", JSON.stringify(timings, null, 2));
