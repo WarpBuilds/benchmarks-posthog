@@ -1,0 +1,62 @@
+name: Post Benchmark Data
+
+on:
+  workflow_run:
+    workflows: ["Benchmark"]
+    types:
+      - completed
+
+jobs:
+  fetch-timings:
+    name: Fetch Benchmark Timings & Upload to R2
+    runs-on: warp-ubuntu-latest-x64-8x
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get Benchmark Workflow Run Details
+        id: get_run
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // This script uses the context of the triggering workflow run
+            const run_id = context.workflowRun.id;
+            const { data: jobs } = await github.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: run_id
+            });
+            // Extract job details including start and completion times.
+            const timings = jobs.jobs.map(job => {
+              const start = new Date(job.started_at);
+              const end = new Date(job.completed_at);
+              const duration = Math.round((end - start) / 1000); // duration in seconds
+              return {
+                job: job.name,
+                duration: duration,
+                started_at: job.started_at,
+                completed_at: job.completed_at
+              };
+            });
+            core.setOutput("timings", JSON.stringify(timings, null, 2));
+            return timings;
+      - name: Write Timings to File
+        run: |
+          echo "${{ steps.get_run.outputs.timings }}" > timings.json
+          cat timings.json
+
+      - name: Configure AWS Credentials for R2
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.R2_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.R2_SECRET_KEY }}
+          aws-region: us-east-1
+
+      - name: Upload merged timings to R2
+        run: |
+          # Capture the current run ID and upload time in ISO8601 format
+          RUN_ID=${{ github.run_id }}
+          UPLOAD_TIME=$(date --utc +'%Y-%m-%dT%H:%M:%SZ')
+
+          # Upload the updated JSON file to R2 using the specified path
+          aws s3 cp timings.json s3://warpbuild-benchmarks/docker/posthog/timings/${UPLOAD_TIME}-${RUN_ID}.json --acl public-read --endpoint-url ${{ secrets.R2_ENDPOINT }}
