@@ -24,8 +24,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  build-with-depot:
-    name: Build with Depot
+  build-with-warpbuilds:
+    name: Build with WarpBuilds
     runs-on: warp-ubuntu-latest-x64-4x
     steps:
       - uses: actions/checkout@v4
