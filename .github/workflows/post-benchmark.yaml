@@ -61,4 +61,4 @@ jobs:
           UPLOAD_TIME=$(date --utc +'%Y-%m-%dT%H:%M:%SZ')
 
           # Upload the updated JSON file to R2 using the specified path
-          aws s3 cp timings.json s3://warpbuild-benchmarks/docker/posthog/timings/${UPLOAD_TIME}-${RUN_ID}.json --acl public-read --endpoint-url ${{ secrets.R2_ENDPOINT }}
+          aws s3 cp timings.json s3://warpbuild-benchmarks/docker/posthog/timings/${UPLOAD_TIME}-${RUN_ID}.json --endpoint-url ${{ secrets.R2_ENDPOINT }}
