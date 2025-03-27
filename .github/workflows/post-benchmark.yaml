@@ -20,10 +20,10 @@ jobs:
         with:
           script: |
             // This script uses the context of the triggering workflow run
-            const run_id = context.workflow_run.id;
+            const run_id = context.payload.workflow_run.id;
             const { data: jobs } = await github.actions.listJobsForWorkflowRun({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              owner: context.payload.repository.owner.login,
+              repo: context.payload.repository.name,
               run_id: run_id
             });
             console.log(jobs);
