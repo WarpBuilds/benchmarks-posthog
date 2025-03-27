@@ -20,12 +20,14 @@ jobs:
         with:
           script: |
             // This script uses the context of the triggering workflow run
-            const run_id = context.workflowRun.id;
+            const run_id = github.event.workflow_run.id;
+            console.log(github.event.workflow_run);
             const { data: jobs } = await github.actions.listJobsForWorkflowRun({
               owner: context.repo.owner,
               repo: context.repo.repo,
               run_id: run_id
             });
+            console.log(jobs);
             // Extract job details including start and completion times.
             const timings = jobs.jobs.map(job => {
               const start = new Date(job.started_at);
@@ -39,6 +41,7 @@ jobs:
               };
             });
             core.setOutput("timings", JSON.stringify(timings, null, 2));
+            console.log(timings);
             return timings;
       - name: Write Timings to File
         run: |
