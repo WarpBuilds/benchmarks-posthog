@@ -68,9 +68,12 @@ jobs:
 
       - name: Upload merged timings to R2
         run: |
-          # Capture the current run ID and upload time in ISO8601 format
+          # Capture the current run ID and separate date components
           RUN_ID=${{ github.run_id }}
-          UPLOAD_TIME=$(date --utc +'%Y-%m-%dT%H:%M:%SZ')
+          YEAR=$(date --utc +'%Y')
+          MONTH=$(date --utc +'%m')
+          DAY=$(date --utc +'%d')
+          TIME=$(date --utc +'%H:%M:%SZ')
 
-          # Upload the updated JSON file to R2 using the specified path
-          aws s3 cp timings.json s3://warpbuild-benchmarks/docker-builders/posthog/timings/${UPLOAD_TIME}-${RUN_ID}.json --endpoint-url ${{ secrets.R2_ENDPOINT }} --debug --checksum-algorithm CRC32
+          # Upload the updated JSON file to R2 using date-based directory structure
+          aws s3 cp timings.json s3://warpbuild-benchmarks/docker-builders/posthog/timings/${YEAR}/${MONTH}/${DAY}/${TIME}-${RUN_ID}.json --endpoint-url ${{ secrets.R2_ENDPOINT }} --debug --checksum-algorithm CRC32
