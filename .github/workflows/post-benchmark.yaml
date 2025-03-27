@@ -20,6 +20,9 @@ jobs:
         with:
           script: |
             // This script uses the context of the triggering workflow run
+            console.log(github.event);
+            console.log(context)
+            console.log(github.event.workflow_run);
             const run_id = github.event.workflow_run.id;
             console.log(github.event.workflow_run);
             const { data: jobs } = await github.actions.listJobsForWorkflowRun({
