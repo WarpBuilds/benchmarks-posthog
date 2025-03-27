@@ -7,7 +7,7 @@ on:
 jobs:
   sync:
     name: Sync With Upstream
-    runs-on: warp-ubuntu-latest-x64-2x
+    runs-on: warp-ubuntu-latest-x64-4x
     steps:
       - uses: actions/create-github-app-token@v1
         id: app-token
