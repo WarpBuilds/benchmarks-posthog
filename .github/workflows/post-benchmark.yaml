@@ -26,7 +26,6 @@ jobs:
               repo: context.payload.repository.name,
               run_id: run_id
             });
-            console.log(jobs);
             // Extract job details including start and completion times.
             const timings = jobs.jobs.map(job => {
               const start = new Date(job.started_at);
@@ -48,7 +47,8 @@ jobs:
                 html_url: job.html_url,
                 status: job.status,
                 conclusion: job.conclusion,
-                provider: jobProvider
+                provider: jobProvider,
+                arch: ['amd64', 'arm64']
               };
             });
             core.setOutput("timings", JSON.stringify(timings, null, 2));
@@ -72,4 +72,4 @@ jobs:
           UPLOAD_TIME=$(date --utc +'%Y-%m-%dT%H:%M:%SZ')
 
           # Upload the updated JSON file to R2 using the specified path
-          aws s3 cp timings.json s3://warpbuild-benchmarks/docker/posthog/timings/${UPLOAD_TIME}-${RUN_ID}.json --endpoint-url ${{ secrets.R2_ENDPOINT }} --debug --checksum-algorithm CRC32
+          aws s3 cp timings.json s3://warpbuild-benchmarks/docker-builders/posthog/timings/${UPLOAD_TIME}-${RUN_ID}.json --endpoint-url ${{ secrets.R2_ENDPOINT }} --debug --checksum-algorithm CRC32
