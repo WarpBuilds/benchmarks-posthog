@@ -60,7 +60,8 @@ jobs:
             return timings;
       - name: Write Timings to File
         run: |
-          echo "${{ steps.get_run.outputs.timings }}" > timings.json
+          # Use jq to ensure proper JSON formatting is maintained
+          echo '${{ steps.get_run.outputs.timings }}' | jq '.' > timings.json
           cat timings.json
 
       - name: Set AWS Credentials for R2
@@ -79,4 +80,4 @@ jobs:
           TIME=$(date --utc +'%H:%M:%SZ')
 
           # Upload the updated JSON file to R2 using date-based directory structure
-          aws s3 cp timings.json s3://warpbuild-benchmarks/docker-builders/posthog/timings/${YEAR}/${MONTH}/${DAY}/${TIME}-${RUN_ID}.json --endpoint-url ${{ secrets.R2_ENDPOINT }} --debug --checksum-algorithm CRC32
+          aws s3 cp timings.json s3://warpbuild-benchmarks/docker-builders/posthog/timings/${YEAR}/${MONTH}/${DAY}/${TIME}-${RUN_ID}.json --endpoint-url ${{ secrets.R2_ENDPOINT }} --debug --checksum-algorithm CRC32 --content-type "application/json"
