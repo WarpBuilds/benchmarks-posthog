@@ -23,6 +23,7 @@ jobs:
             // This script uses the context of the triggering workflow run
             const run_id = context.payload.workflow_run.id;
             const workflow_name = context.payload.workflow_run.name;
+            const display_title = context.payload.workflow_run.display_title || '';
 
             const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
               owner: context.payload.repository.owner.login,
@@ -43,6 +44,7 @@ jobs:
                 "id": job.id,
                 "job": job.name,
                 "workflow_name": workflow_name,
+                "display_title": display_title,
                 "duration": duration,
                 "created_at": job.created_at,
                 "started_at": job.started_at,
