@@ -66,11 +66,6 @@ jobs:
 
             console.log(timingsJson);
             return timings;
-      - name: Write Timings to File
-        run: |
-          # Use jq to ensure proper JSON formatting is maintained
-          echo '${{ steps.get_run.outputs.timings }}' | jq '.' > timings.json
-          cat timings.json
 
       - name: Verify JSON File
         run: |
