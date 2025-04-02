@@ -38,18 +38,18 @@ jobs:
                 jobProvider = 'warpbuild';
               }
               return {
-                id: job.id,
-                job: job.name,
-                duration: duration,
-                created_at: job.created_at,
-                started_at: job.started_at,
-                completed_at: job.completed_at,
-                run_url: job.run_url,
-                html_url: job.html_url,
-                status: job.status,
-                conclusion: job.conclusion,
-                provider: jobProvider,
-                arch: ['amd64', 'arm64']
+                "id": job.id,
+                "job": job.name,
+                "duration": duration,
+                "created_at": job.created_at,
+                "started_at": job.started_at,
+                "completed_at": job.completed_at,
+                "run_url": job.run_url,
+                "html_url": job.html_url,
+                "status": job.status,
+                "conclusion": job.conclusion,
+                "provider": jobProvider,
+                "arch": ["amd64", "arm64"]
               };
             });
             core.setOutput("timings", JSON.stringify(timings, null, 2));
