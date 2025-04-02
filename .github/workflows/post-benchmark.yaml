@@ -57,14 +57,28 @@ jobs:
                 "arch": ["amd64", "arm64"]
               };
             });
-            core.setOutput("timings", JSON.stringify(timings, null, 2));
-            console.log(timings);
+            // Write the timings directly to a file
+            const timingsJson = JSON.stringify(timings, null, 2);
+            fs.writeFileSync('timings.json', timingsJson);
+
+            // Still set the output for potential other uses
+            core.setOutput("timings", timingsJson);
+
+            console.log(timingsJson);
             return timings;
       - name: Write Timings to File
         run: |
           # Use jq to ensure proper JSON formatting is maintained
           echo '${{ steps.get_run.outputs.timings }}' | jq '.' > timings.json
           cat timings.json
+
+      - name: Verify JSON File
+        run: |
+          echo "Contents of timings.json:"
+          cat timings.json
+          echo ""
+          echo "Validating JSON format..."
+          jq '.' timings.json > /dev/null && echo "✅ JSON is valid" || echo "❌ JSON is invalid"
 
       - name: Set AWS Credentials for R2
         run: |
@@ -82,4 +96,4 @@ jobs:
           TIME=$(date --utc +'%H:%M:%SZ')
 
           # Upload the updated JSON file to R2 using date-based directory structure
-          aws s3 cp timings.json s3://warpbuild-benchmarks/docker-builders/posthog/timings/${YEAR}/${MONTH}/${DAY}/${TIME}-${RUN_ID}.json --endpoint-url ${{ secrets.R2_ENDPOINT }} --debug --checksum-algorithm CRC32 --content-type "application/json"
+          aws s3 cp timings.json s3://warpbuild-benchmarks/docker-builders/posthog/timings/${YEAR}/${MONTH}/${DAY}/${TIME}-${RUN_ID}.json --endpoint-url ${{ secrets.R2_ENDPOINT }} --checksum-algorithm CRC32 --content-type "application/json"
