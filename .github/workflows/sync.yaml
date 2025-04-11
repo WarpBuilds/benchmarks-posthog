@@ -34,9 +34,12 @@ jobs:
         run: |
           git submodule init
           git submodule update --remote --merge
-          export UPSTREAM_URL="$(cd upstream && git remote get-url origin)"
-          export COMMIT_SHA="$(cd upstream && git rev-parse HEAD)"
-          git commit -am "Update upstream to ${UPSTREAM_URL}/commit/${COMMIT_SHA}" || echo "No changes to commit"
+
+          # Get the upstream commit message
+          UPSTREAM_COMMIT_MSG=$(cd upstream && git log -1 --pretty=%B)
+
+          # Use the upstream commit message
+          git commit -am "${UPSTREAM_COMMIT_MSG}" || echo "No changes to commit"
           git push origin main
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
