@@ -13,7 +13,7 @@ permissions:
 jobs:
   build-with-docker:
     name: Build with Docker
-    runs-on: ubuntu-22.04
+    runs-on: warp-ubuntu-2204-x64-4x
     steps:
       - uses: actions/checkout@v4
         with:
